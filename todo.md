@@ -62,3 +62,16 @@
 - [x] Crear galería de amigurumis en página de inicio
 - [x] Ajustar colores y estilos
 - [x] Verificar que todo funciona correctamente
+
+
+## Refinamientos Solicitados
+
+- [x] Quitar logo de la galería de amigurumis
+- [x] Mostrar logo junto al nombre en header
+- [x] Agregar botón WhatsApp flotante
+- [x] Cambiar título a "Algunas de Nuestras Creaciones"
+- [x] Corregir nombres de vírgenes (Fátima, Guadalupe)
+- [x] Agregar detalles: LED, denarios, coronas
+- [x] Hacer imágenes pequeñas con modal para ampliar
+- [x] Agregar botón "Solicitar" en cada imagen
+- [x] Optimizar para visualización móvil

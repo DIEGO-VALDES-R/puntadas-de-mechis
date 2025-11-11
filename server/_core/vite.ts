@@ -21,6 +21,15 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
+  
+  // Serve gallery images with correct CORS headers
+  app.use('/gallery', express.static(path.resolve(import.meta.dirname, '../..', 'client', 'public', 'gallery'), {
+    setHeaders: (res) => {
+      res.set('Cache-Control', 'public, max-age=31536000');
+      res.set('Access-Control-Allow-Origin', '*');
+    }
+  }));
+  
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
