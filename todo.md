@@ -115,3 +115,11 @@
 - [x] Implementar historial de estado (inicio, en progreso, finalizado)
 - [x] Agregar funcionalidad para imprimir código QR
 - [x] Crear vista pública de rastreo por código QR
+
+
+## Correcciones Solicitadas por Usuario
+
+- [x] Migrar productos hardcodeados de Home.tsx a la base de datos
+- [x] Conectar galería de Home.tsx con productos de base de datos
+- [x] Verificar que gestor de galería muestre todos los productos
+- [x] Permitir edición, eliminación y creación de productos desde admin/gallery
