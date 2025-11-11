@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Loader2, MessageSquare, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Loader2, MessageSquare, CheckCircle, Clock, AlertCircle, Search, Filter, Download, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
@@ -13,6 +13,9 @@ export default function AdminDashboard() {
   const [adminMessage, setAdminMessage] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "deposit">("newest");
 
   // Check if user is admin
   if (user?.role !== "admin") {
@@ -121,6 +124,23 @@ export default function AdminDashboard() {
     return labels[status] || status;
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "deposit_paid":
+        return "bg-blue-100 text-blue-800";
+      case "in_progress":
+        return "bg-purple-100 text-purple-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   if (requestsQuery.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
@@ -132,28 +152,162 @@ export default function AdminDashboard() {
     );
   }
 
-  const requests = requestsQuery.data || [];
+  let requests = requestsQuery.data || [];
+
+  // Filter by status
+  if (statusFilter !== "all") {
+    requests = requests.filter(r => r.status === statusFilter);
+  }
+
+  // Search
+  if (searchTerm) {
+    requests = requests.filter(r =>
+      r.id.toString().includes(searchTerm) ||
+      r.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // Sort
+  if (sortBy === "newest") {
+    requests = [...requests].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } else if (sortBy === "oldest") {
+    requests = [...requests].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  } else if (sortBy === "deposit") {
+    requests = [...requests].sort((a, b) => b.depositAmount - a.depositAmount);
+  }
+
   const selectedRequest = requests.find(r => r.id === selectedRequestId);
+
+  // Calculate statistics
+  const stats = {
+    total: requestsQuery.data?.length || 0,
+    pending: requestsQuery.data?.filter(r => r.status === "pending").length || 0,
+    inProgress: requestsQuery.data?.filter(r => r.status === "in_progress").length || 0,
+    completed: requestsQuery.data?.filter(r => r.status === "completed").length || 0,
+    totalDeposits: requestsQuery.data?.reduce((sum, r) => sum + r.depositAmount, 0) || 0,
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Panel de Administración</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Panel de Administración</h1>
           <p className="text-gray-600">Gestiona todas las solicitudes de amigurumis</p>
         </div>
 
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <Card className="border-0 shadow-md">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-gray-600 text-sm font-medium">Total</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-yellow-600 text-sm font-medium">Pendientes</p>
+                <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-purple-600 text-sm font-medium">En Progreso</p>
+                <p className="text-3xl font-bold text-purple-600">{stats.inProgress}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-green-600 text-sm font-medium">Completadas</p>
+                <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-md">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <p className="text-blue-600 text-sm font-medium">Abonos</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  ${(stats.totalDeposits / 100).toLocaleString("es-CO")}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Requests List */}
+          {/* Requests Table */}
           <div className="lg:col-span-2 space-y-4">
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle>Solicitudes ({requests.length})</CardTitle>
+                <CardDescription>Filtra y busca solicitudes de clientes</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+              <CardContent className="space-y-4">
+                {/* Search and Filters */}
+                <div className="space-y-3">
+                  {/* Search */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Buscar por ID o descripción..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                    />
+                  </div>
+
+                  {/* Filters */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-medium text-gray-700 block mb-1">Estado</label>
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                      >
+                        <option value="all">Todos</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="deposit_paid">Abono Pagado</option>
+                        <option value="in_progress">En Progreso</option>
+                        <option value="completed">Completado</option>
+                        <option value="cancelled">Cancelado</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium text-gray-700 block mb-1">Ordenar por</label>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                      >
+                        <option value="newest">Más Reciente</option>
+                        <option value="oldest">Más Antiguo</option>
+                        <option value="deposit">Mayor Abono</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Requests List */}
+                <div className="space-y-2 max-h-[600px] overflow-y-auto">
                   {requests.length === 0 ? (
-                    <p className="text-gray-500 text-center py-8">Sin solicitudes</p>
+                    <div className="text-center py-12">
+                      <p className="text-gray-500">No hay solicitudes que coincidan con los filtros</p>
+                    </div>
                   ) : (
                     requests.map((request) => (
                       <div
@@ -162,27 +316,32 @@ export default function AdminDashboard() {
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                           selectedRequestId === request.id
                             ? "border-pink-500 bg-pink-50"
-                            : "border-gray-200 hover:border-pink-300"
+                            : "border-gray-200 hover:border-pink-300 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
                               {getStatusIcon(request.status)}
-                              <h4 className="font-semibold text-gray-900">
+                              <h4 className="font-semibold text-gray-900 truncate">
                                 Solicitud #{request.id}
                               </h4>
                             </div>
-                            <p className="text-sm text-gray-600 mb-1">
-                              Abono: COP ${(request.depositAmount / 100).toLocaleString("es-CO")}
+                            <p className="text-sm text-gray-600 mb-1 truncate">
+                              {request.description.substring(0, 50)}...
                             </p>
-                            <p className="text-xs text-gray-500">
-                              {new Date(request.createdAt).toLocaleDateString("es-CO")}
-                            </p>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <span>Abono: COP ${(request.depositAmount / 100).toLocaleString("es-CO")}</span>
+                              <span>•</span>
+                              <span>{new Date(request.createdAt).toLocaleDateString("es-CO")}</span>
+                            </div>
                           </div>
-                          <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded">
-                            {getStatusLabel(request.status)}
-                          </span>
+                          <div className="flex flex-col items-end gap-2">
+                            <span className={`text-xs font-medium px-2 py-1 rounded whitespace-nowrap ${getStatusColor(request.status)}`}>
+                              {getStatusLabel(request.status)}
+                            </span>
+                            <Eye className="h-4 w-4 text-gray-400" />
+                          </div>
                         </div>
                       </div>
                     ))
@@ -198,29 +357,52 @@ export default function AdminDashboard() {
               {/* Request Details */}
               <Card className="border-0 shadow-lg">
                 <CardHeader>
-                  <CardTitle className="text-lg">Detalles</CardTitle>
+                  <CardTitle className="text-lg">Detalles de Solicitud</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <div>
-                    <p className="text-gray-600 font-medium">ID:</p>
-                    <p className="text-gray-900">#{selectedRequest.id}</p>
+                <CardContent className="space-y-4 text-sm">
+                  <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-3 rounded-lg">
+                    <p className="text-gray-600 font-medium mb-1">ID de Solicitud</p>
+                    <p className="text-2xl font-bold text-gray-900">#{selectedRequest.id}</p>
                   </div>
+
                   <div>
-                    <p className="text-gray-600 font-medium">Empaque:</p>
-                    <p className="text-gray-900 capitalize">
+                    <p className="text-gray-600 font-medium mb-1">Estado</p>
+                    <span className={`inline-block text-xs font-medium px-3 py-1 rounded ${getStatusColor(selectedRequest.status)}`}>
+                      {getStatusLabel(selectedRequest.status)}
+                    </span>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-600 font-medium mb-1">Empaque</p>
+                    <p className="text-gray-900 capitalize bg-gray-50 p-2 rounded">
                       {selectedRequest.packageType.replace(/_/g, " ")}
                     </p>
                   </div>
+
                   <div>
-                    <p className="text-gray-600 font-medium">Abono:</p>
-                    <p className="text-gray-900">
+                    <p className="text-gray-600 font-medium mb-1">Abono Pagado</p>
+                    <p className="text-lg font-bold text-green-600">
                       COP ${(selectedRequest.depositAmount / 100).toLocaleString("es-CO")}
                     </p>
                   </div>
+
                   <div>
-                    <p className="text-gray-600 font-medium">Descripción:</p>
-                    <p className="text-gray-900 text-xs line-clamp-3">
+                    <p className="text-gray-600 font-medium mb-1">Descripción</p>
+                    <p className="text-gray-900 bg-gray-50 p-2 rounded text-xs leading-relaxed">
                       {selectedRequest.description}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-gray-600 font-medium mb-1">Fecha de Solicitud</p>
+                    <p className="text-gray-900">
+                      {new Date(selectedRequest.createdAt).toLocaleDateString("es-CO", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                 </CardContent>
@@ -272,15 +454,15 @@ export default function AdminDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <div className="bg-gray-50 rounded-lg p-3 space-y-2 max-h-32 overflow-y-auto">
+                  <div className="bg-gray-50 rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto">
                     {communicationsQuery.data && communicationsQuery.data.length > 0 ? (
                       communicationsQuery.data.map((msg) => (
                         <div
                           key={msg.id}
                           className={`p-2 rounded text-xs ${
                             msg.senderType === "admin"
-                              ? "bg-pink-100 text-pink-900"
-                              : "bg-blue-100 text-blue-900"
+                              ? "bg-pink-100 text-pink-900 ml-4"
+                              : "bg-blue-100 text-blue-900 mr-4"
                           }`}
                         >
                           <p className="font-medium mb-1">
@@ -290,7 +472,7 @@ export default function AdminDashboard() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-center py-4">Sin mensajes</p>
+                      <p className="text-gray-500 text-center py-4 text-xs">Sin mensajes</p>
                     )}
                   </div>
                   <textarea
@@ -308,7 +490,7 @@ export default function AdminDashboard() {
                     {isSubmitting ? (
                       <Loader2 className="mr-2 h-3 w-3 animate-spin" />
                     ) : null}
-                    Enviar
+                    Enviar Mensaje
                   </Button>
                 </CardContent>
               </Card>

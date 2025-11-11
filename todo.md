@@ -75,3 +75,15 @@
 - [x] Hacer imágenes pequeñas con modal para ampliar
 - [x] Agregar botón "Solicitar" en cada imagen
 - [x] Optimizar para visualización móvil
+
+
+## Panel de Administración - Nuevas Características
+
+- [x] Crear página AdminDashboard mejorada con tabla de solicitudes
+- [x] Implementar vista de detalles de solicitud
+- [x] Agregar sistema de cambio de estado
+- [x] Crear sistema de mensajería entre admin y cliente
+- [x] Agregar filtros y búsqueda de solicitudes
+- [ ] Implementar exportación de datos (CSV/PDF)
+- [x] Agregar estadísticas y métricas
+- [ ] Crear componente de galería de imágenes de solicitudes
