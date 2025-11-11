@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,105 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Customer queries
+export async function createCustomer(data: InsertCustomer) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(customers).values(data);
+  return result;
+}
+
+export async function getCustomerByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(customers).where(eq(customers.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getCustomerById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(customers).where(eq(customers.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Amigurumi request queries
+export async function createAmigurumiRequest(data: InsertAmigurumiRequest) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(amigurumiRequests).values(data);
+  return result;
+}
+
+export async function getAmigurumiRequestById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(amigurumiRequests).where(eq(amigurumiRequests.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAmigurumiRequestsByCustomerId(customerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(amigurumiRequests).where(eq(amigurumiRequests.customerId, customerId));
+}
+
+export async function getAllAmigurumiRequests() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(amigurumiRequests);
+}
+
+export async function updateAmigurumiRequest(id: number, data: Partial<InsertAmigurumiRequest>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(amigurumiRequests).set(data).where(eq(amigurumiRequests.id, id));
+}
+
+// Payment queries
+export async function createPayment(data: InsertPayment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(payments).values(data);
+  return result;
+}
+
+export async function getPaymentByBoldTransactionId(boldTransactionId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(payments).where(eq(payments.boldTransactionId, boldTransactionId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updatePayment(id: number, data: Partial<InsertPayment>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(payments).set(data).where(eq(payments.id, id));
+}
+
+// Communication queries
+export async function createCommunication(data: InsertCommunication) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(communications).values(data);
+  return result;
+}
+
+export async function getCommunicationsByRequestId(requestId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(communications).where(eq(communications.requestId, requestId));
+}
