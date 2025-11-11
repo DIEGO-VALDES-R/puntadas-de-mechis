@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Edit2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import ImageUpload from "@/components/ImageUpload";
 
 export default function GalleryManager() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -22,6 +24,35 @@ export default function GalleryManager() {
   const createMutation = trpc.gallery.create.useMutation();
   const updateMutation = trpc.gallery.update.useMutation();
   const deleteMutation = trpc.gallery.delete.useMutation();
+  const uploadImageMutation = trpc.gallery.uploadImage.useMutation();
+
+  const handleImageSelect = async (file: File, preview: string) => {
+    setIsUploading(true);
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string;
+        try {
+          const result = await uploadImageMutation.mutateAsync({
+            imageBase64: base64,
+            fileName: file.name,
+          });
+          setFormData({ ...formData, imageUrl: result.imageUrl });
+          toast.success("Imagen cargada exitosamente");
+        } catch (error) {
+          toast.error("Error al cargar la imagen");
+          console.error(error);
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast.error("Error al procesar la imagen");
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +131,7 @@ export default function GalleryManager() {
                 Nuevo Producto
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {editingId ? "Editar Producto" : "Nuevo Producto"}
@@ -131,17 +162,19 @@ export default function GalleryManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    URL de Imagen
+                  <label className="block text-sm font-medium mb-2">
+                    Imagen
                   </label>
-                  <Input
-                    value={formData.imageUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imageUrl: e.target.value })
-                    }
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    type="url"
+                  <ImageUpload
+                    onImageSelect={handleImageSelect}
+                    currentImage={formData.imageUrl}
+                    disabled={isUploading}
                   />
+                  {formData.imageUrl && (
+                    <p className="text-sm text-green-600 mt-2">
+                      ✓ Imagen cargada
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">
@@ -164,7 +197,10 @@ export default function GalleryManager() {
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                  <Button 
+                    type="submit" 
+                    disabled={createMutation.isPending || updateMutation.isPending || isUploading}
+                  >
                     {editingId ? "Actualizar" : "Crear"}
                   </Button>
                 </div>

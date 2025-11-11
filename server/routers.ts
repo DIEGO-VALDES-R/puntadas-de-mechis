@@ -299,6 +299,7 @@ export const appRouter = router({
           title: z.string().optional(),
           description: z.string().optional(),
           price: z.number().optional(),
+          imageUrl: z.string().optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -309,6 +310,7 @@ export const appRouter = router({
           title: input.title,
           description: input.description,
           price: input.price,
+          imageUrl: input.imageUrl,
         });
         return { success: true };
       }),
@@ -321,6 +323,40 @@ export const appRouter = router({
         }
         await deleteGalleryItem(input.id);
         return { success: true };
+      }),
+
+    uploadImage: protectedProcedure
+      .input(
+        z.object({
+          imageBase64: z.string(),
+          fileName: z.string(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can upload images");
+        }
+        
+        try {
+          // Import storagePut from storage module
+          const { storagePut } = await import("./storage");
+          
+          // Convert base64 to buffer
+          const buffer = Buffer.from(input.imageBase64.split(",")[1], "base64");
+          
+          // Generate unique filename
+          const timestamp = Date.now();
+          const randomSuffix = Math.random().toString(36).substring(7);
+          const fileKey = `gallery/${timestamp}-${randomSuffix}-${input.fileName}`;
+          
+          // Upload to S3
+          const { url } = await storagePut(fileKey, buffer, "image/jpeg");
+          
+          return { success: true, imageUrl: url };
+        } catch (error) {
+          console.error("Image upload error:", error);
+          throw new Error("Failed to upload image");
+        }
       }),
   }),
 

@@ -123,3 +123,12 @@
 - [x] Conectar galería de Home.tsx con productos de base de datos
 - [x] Verificar que gestor de galería muestre todos los productos
 - [x] Permitir edición, eliminación y creación de productos desde admin/gallery
+
+
+## Funcionalidad de Carga de Imágenes
+
+- [x] Crear componente ImageUpload con vista previa
+- [x] Integrar carga de imágenes en GalleryManager
+- [x] Agregar procedimiento tRPC para subir imágenes a S3
+- [x] Permitir edición de productos con cambio de foto
+- [x] Validar tipos y tamaños de archivo
