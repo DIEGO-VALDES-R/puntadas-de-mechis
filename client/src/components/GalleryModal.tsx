@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X, ShoppingCart } from "lucide-react";
 import { Link } from "wouter";
@@ -21,6 +21,7 @@ export default function GalleryModal({ isOpen, onClose, image }: GalleryModalPro
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto p-0 bg-white">
+        <DialogTitle className="sr-only">{image.title}</DialogTitle>
         <div className="relative">
           {/* Close Button */}
           <button
