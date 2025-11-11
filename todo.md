@@ -87,3 +87,8 @@
 - [ ] Implementar exportación de datos (CSV/PDF)
 - [x] Agregar estadísticas y métricas
 - [ ] Crear componente de galería de imágenes de solicitudes
+
+
+## Correcciones de Errores
+
+- [x] Corregir error de hooks en AdminDashboard (mover hooks fuera de condicionales)

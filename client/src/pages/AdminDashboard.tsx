@@ -17,33 +17,16 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "deposit">("newest");
 
-  // Check if user is admin
-  if (user?.role !== "admin") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>Acceso Denegado</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">No tienes permisos para acceder al panel de administración.</p>
-              <Link href="/">
-                <Button>Volver al Inicio</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
+  // Fetch all requests - moved to top level
   const requestsQuery = trpc.request.getAll.useQuery();
+  
+  // Fetch communications - always called, but with enabled condition
   const communicationsQuery = trpc.communication.getByRequestId.useQuery(
     { requestId: selectedRequestId || 0 },
     { enabled: !!selectedRequestId }
   );
 
+  // Mutations
   const updateRequestMutation = trpc.request.update.useMutation({
     onSuccess: () => {
       toast.success("Solicitud actualizada");
@@ -64,6 +47,27 @@ export default function AdminDashboard() {
       toast.error(error.message || "Error al enviar mensaje");
     },
   });
+
+  // Check if user is admin
+  if (user?.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle>Acceso Denegado</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 mb-4">No tienes permisos para acceder al panel de administración.</p>
+              <Link href="/">
+                <Button>Volver al Inicio</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const handleUpdateStatus = async (requestId: number, newStatus: string) => {
     setIsSubmitting(true);
