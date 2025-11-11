@@ -51,3 +51,14 @@
 - Integración con Bold para pagos
 - Notificaciones por email implementadas
 - SMS pendiente de integración (requiere servicio externo)
+
+
+## Actualizaciones de Branding - PUNTADAS DE MECHIS
+
+- [x] Copiar imágenes de amigurumis al proyecto
+- [x] Optimizar imágenes para web
+- [x] Cambiar nombre de la plataforma a "PUNTADAS DE MECHIS"
+- [x] Integrar logo en la página
+- [x] Crear galería de amigurumis en página de inicio
+- [x] Ajustar colores y estilos
+- [x] Verificar que todo funciona correctamente
