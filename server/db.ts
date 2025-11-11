@@ -1,6 +1,6 @@
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication } from "../drizzle/schema";
+import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication, galleryItems, InsertGalleryItem, qrCodeTracking, InsertQRCodeTracking, completionNotifications, InsertCompletionNotification } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -190,4 +190,74 @@ export async function getCommunicationsByRequestId(requestId: number) {
   if (!db) return [];
   
   return await db.select().from(communications).where(eq(communications.requestId, requestId));
+}
+
+// Gallery queries
+export async function createGalleryItem(data: InsertGalleryItem) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(galleryItems).values(data);
+  return result;
+}
+
+export async function getAllGalleryItems() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(galleryItems).where(eq(galleryItems.isActive, true));
+}
+
+export async function updateGalleryItem(id: number, data: Partial<InsertGalleryItem>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(galleryItems).set(data).where(eq(galleryItems.id, id));
+}
+
+export async function deleteGalleryItem(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(galleryItems).set({ isActive: false }).where(eq(galleryItems.id, id));
+}
+
+// QR Code tracking queries
+export async function createQRCodeTracking(data: InsertQRCodeTracking) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(qrCodeTracking).values(data);
+  return result;
+}
+
+export async function getQRCodeTrackingByRequestId(requestId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(qrCodeTracking).where(eq(qrCodeTracking.requestId, requestId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateQRCodeTracking(id: number, data: Partial<InsertQRCodeTracking>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(qrCodeTracking).set(data).where(eq(qrCodeTracking.id, id));
+}
+
+// Completion notification queries
+export async function createCompletionNotification(data: InsertCompletionNotification) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(completionNotifications).values(data);
+  return result;
+}
+
+export async function getCompletionNotificationsByRequestId(requestId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(completionNotifications).where(eq(completionNotifications.requestId, requestId));
 }

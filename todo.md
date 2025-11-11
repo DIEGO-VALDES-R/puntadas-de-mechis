@@ -92,3 +92,26 @@
 ## Correcciones de Errores
 
 - [x] Corregir error de hooks en AdminDashboard (mover hooks fuera de condicionales)
+
+
+## Nuevas Características Solicitadas
+
+### 1. Sistema de Notificación de Finalización
+- [x] Agregar botón "Marcar como Listo" en panel de administración
+- [x] Crear tabla de productos/amigurumis finalizados
+- [x] Implementar notificación automática al cliente cuando se marca como listo
+- [x] Agregar historial de notificaciones enviadas
+
+### 2. Gestor de Galería Editable
+- [x] Crear página de administración de galería
+- [x] Agregar funcionalidad para eliminar fotos de galería
+- [x] Agregar funcionalidad para editar descripciones
+- [x] Agregar funcionalidad para establecer valores/precios
+- [x] Integrar con base de datos para persistencia
+
+### 3. Sistema de Códigos QR para Rastreo
+- [x] Generar código QR único para cada solicitud
+- [x] Crear página de rastreo con código QR
+- [x] Implementar historial de estado (inicio, en progreso, finalizado)
+- [x] Agregar funcionalidad para imprimir código QR
+- [x] Crear vista pública de rastreo por código QR

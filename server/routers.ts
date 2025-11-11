@@ -1,4 +1,5 @@
 import { COOKIE_NAME } from "@shared/const";
+import QRCode from "qrcode";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
@@ -17,6 +18,15 @@ import {
   updatePayment,
   createCommunication,
   getCommunicationsByRequestId,
+  createGalleryItem,
+  getAllGalleryItems,
+  updateGalleryItem,
+  deleteGalleryItem,
+  createQRCodeTracking,
+  getQRCodeTrackingByRequestId,
+  updateQRCodeTracking,
+  createCompletionNotification,
+  getCompletionNotificationsByRequestId,
 } from "./db";
 import { notifyNewRequest, notifyPaymentReceived } from "./notifications";
 import { mapBoldStatusToInternal } from "./bold";
@@ -251,6 +261,150 @@ export const appRouter = router({
       .input(z.object({ requestId: z.number() }))
       .query(async ({ input }) => {
         return await getCommunicationsByRequestId(input.requestId);
+      }),
+  }),
+
+  // Gallery management
+  gallery: router({
+    getAll: publicProcedure.query(async () => {
+      return await getAllGalleryItems();
+    }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          description: z.string().optional(),
+          imageUrl: z.string().url(),
+          price: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can create gallery items");
+        }
+        await createGalleryItem({
+          title: input.title,
+          description: input.description,
+          imageUrl: input.imageUrl,
+          price: input.price,
+        });
+        return { success: true };
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          title: z.string().optional(),
+          description: z.string().optional(),
+          price: z.number().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can update gallery items");
+        }
+        await updateGalleryItem(input.id, {
+          title: input.title,
+          description: input.description,
+          price: input.price,
+        });
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can delete gallery items");
+        }
+        await deleteGalleryItem(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // QR Code tracking
+  qrTracking: router({
+    generateForRequest: protectedProcedure
+      .input(z.object({ requestId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can generate QR codes");
+        }
+
+        const qrData = `https://puntadas-de-mechis.com/track/${input.requestId}`;
+        const qrCode = await QRCode.toDataURL(qrData);
+
+        await createQRCodeTracking({
+          requestId: input.requestId,
+          qrCode,
+        });
+
+        return { qrCode, success: true };
+      }),
+
+    getByRequestId: publicProcedure
+      .input(z.object({ requestId: z.number() }))
+      .query(async ({ input }) => {
+        return await getQRCodeTrackingByRequestId(input.requestId);
+      }),
+
+    updateStatus: protectedProcedure
+      .input(
+        z.object({
+          requestId: z.number(),
+          status: z.enum(["created", "in_production", "ready", "shipped", "delivered"]),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can update QR status");
+        }
+
+        const qrTracking = await getQRCodeTrackingByRequestId(input.requestId);
+        if (!qrTracking) {
+          throw new Error("QR code not found");
+        }
+
+        await updateQRCodeTracking(qrTracking.id, { status: input.status });
+        return { success: true };
+      }),
+  }),
+
+  // Completion notifications
+  completionNotification: router({
+    markAsReady: protectedProcedure
+      .input(
+        z.object({
+          requestId: z.number(),
+          customerId: z.number(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user?.role !== "admin") {
+          throw new Error("Only admins can mark items as ready");
+        }
+
+        const message = "¡Tu amigurumi está listo! Contáctanos para coordinar la entrega.";
+
+        await createCompletionNotification({
+          requestId: input.requestId,
+          customerId: input.customerId,
+          message,
+          deliveryStatus: "pending",
+        });
+
+        // Update request status to "completed"
+        await updateAmigurumiRequest(input.requestId, { status: "completed" });
+
+        return { success: true, message };
+      }),
+
+    getByRequestId: publicProcedure
+      .input(z.object({ requestId: z.number() }))
+      .query(async ({ input }) => {
+        return await getCompletionNotificationsByRequestId(input.requestId);
       }),
   }),
 });

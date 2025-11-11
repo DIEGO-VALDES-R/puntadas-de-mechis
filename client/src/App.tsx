@@ -12,6 +12,8 @@ import Payment from "./pages/Payment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import MyRequests from "./pages/MyRequests";
 import AdminDashboard from "./pages/AdminDashboard";
+import GalleryManager from "./pages/GalleryManager";
+import TrackingPage from "./pages/TrackingPage";
 
 function Router() {
   return (
@@ -24,6 +26,9 @@ function Router() {
       <Route path={"/payment-success"} component={PaymentSuccess} />
       <Route path={"/my-requests"} component={MyRequests} />
       <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/admin/gallery"} component={GalleryManager} />
+      <Route path={"/:requestId/track"} component={TrackingPage} />
+      <Route path={"/track"} component={TrackingPage} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

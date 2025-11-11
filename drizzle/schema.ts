@@ -96,3 +96,50 @@ export const communications = mysqlTable("communications", {
 
 export type Communication = typeof communications.$inferSelect;
 export type InsertCommunication = typeof communications.$inferInsert;
+
+/**
+ * Gallery items table for showcasing amigurumi creations
+ */
+export const galleryItems = mysqlTable("galleryItems", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  description: text("description"),
+  imageUrl: varchar("imageUrl", { length: 500 }).notNull(),
+  price: int("price"), // Price in cents
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GalleryItem = typeof galleryItems.$inferSelect;
+export type InsertGalleryItem = typeof galleryItems.$inferInsert;
+
+/**
+ * QR Code tracking table for amigurumi production tracking
+ */
+export const qrCodeTracking = mysqlTable("qrCodeTracking", {
+  id: int("id").autoincrement().primaryKey(),
+  requestId: int("requestId").notNull(),
+  qrCode: varchar("qrCode", { length: 500 }).notNull().unique(),
+  status: mysqlEnum("status", ["created", "in_production", "ready", "shipped", "delivered"]).default("created").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type QRCodeTracking = typeof qrCodeTracking.$inferSelect;
+export type InsertQRCodeTracking = typeof qrCodeTracking.$inferInsert;
+
+/**
+ * Completion notifications table
+ */
+export const completionNotifications = mysqlTable("completionNotifications", {
+  id: int("id").autoincrement().primaryKey(),
+  requestId: int("requestId").notNull(),
+  customerId: int("customerId").notNull(),
+  message: text("message").notNull(),
+  sentAt: timestamp("sentAt").defaultNow().notNull(),
+  deliveryStatus: mysqlEnum("deliveryStatus", ["pending", "sent", "failed"]).default("pending").notNull(),
+});
+
+export type CompletionNotification = typeof completionNotifications.$inferSelect;
+export type InsertCompletionNotification = typeof completionNotifications.$inferInsert;

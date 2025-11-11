@@ -48,6 +48,26 @@ export default function AdminDashboard() {
     },
   });
 
+  const markReadyMutation = trpc.completionNotification.markAsReady.useMutation({
+    onSuccess: () => {
+      toast.success("¡Amigurumi marcado como listo! Notificación enviada al cliente");
+      requestsQuery.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error al marcar como listo");
+    },
+  });
+
+  const generateQRMutation = trpc.qrTracking.generateForRequest.useMutation({
+    onSuccess: (data) => {
+      toast.success("Código QR generado exitosamente");
+      requestsQuery.refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Error al generar código QR");
+    },
+  });
+
   // Check if user is admin
   if (user?.role !== "admin") {
     return (
@@ -431,6 +451,37 @@ export default function AdminDashboard() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Button
+                      onClick={() => {
+                        if (selectedRequest) {
+                          markReadyMutation.mutate({
+                            requestId: selectedRequest.id,
+                            customerId: selectedRequest.customerId,
+                          });
+                        }
+                      }}
+                      disabled={isSubmitting || markReadyMutation.isPending}
+                      className="w-full text-xs bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                    >
+                      {markReadyMutation.isPending ? (
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                      ) : null}
+                      ✓ Marcar como Listo
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        if (selectedRequest) {
+                          generateQRMutation.mutate({ requestId: selectedRequest.id });
+                        }
+                      }}
+                      disabled={isSubmitting || generateQRMutation.isPending}
+                      className="w-full text-xs bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700"
+                    >
+                      {generateQRMutation.isPending ? (
+                        <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                      ) : null}
+                      QR Código
+                    </Button>
                     {["in_progress", "completed", "cancelled"].map((status) => (
                       <Button
                         key={status}
