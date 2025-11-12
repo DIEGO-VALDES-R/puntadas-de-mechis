@@ -106,6 +106,9 @@ export const galleryItems = mysqlTable("galleryItems", {
   description: text("description"),
   imageUrl: varchar("imageUrl", { length: 500 }).notNull(),
   price: int("price"), // Price in cents
+  category: varchar("category", { length: 100 }), // e.g., "virgenes", "sirenas", "animales", "disney"
+  isHighlighted: boolean("isHighlighted").default(false).notNull(), // Para fotos destacadas
+  highlightOrder: int("highlightOrder"), // Orden de las fotos destacadas
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -357,3 +360,40 @@ export const communityComments = mysqlTable("communityComments", {
 
 export type CommunityComment = typeof communityComments.$inferSelect;
 export type InsertCommunityComment = typeof communityComments.$inferInsert;
+
+
+/**
+ * Gallery categories table
+ */
+export const galleryCategories = mysqlTable("galleryCategories", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  icon: varchar("icon", { length: 100 }), // Icon name or emoji
+  order: int("order").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type GalleryCategory = typeof galleryCategories.$inferSelect;
+export type InsertGalleryCategory = typeof galleryCategories.$inferInsert;
+
+/**
+ * Promotion/Discount table for percentage-based discounts
+ */
+export const promotions = mysqlTable("promotions", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description"),
+  discountPercentage: int("discountPercentage").notNull(), // 0-100
+  galleryItemId: int("galleryItemId"), // If null, applies to all items
+  validFrom: timestamp("validFrom"),
+  validUntil: timestamp("validUntil"),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Promotion = typeof promotions.$inferSelect;
+export type InsertPromotion = typeof promotions.$inferInsert;

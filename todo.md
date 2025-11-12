@@ -199,3 +199,42 @@
 - [ ] Crear página de retos
 - [ ] Implementar sistema de compra de patrones/clases
 - [ ] Crear comunidad/foro de tejedoras
+
+
+## Nuevas Características - Fase 2
+
+### 1. Sistema de Promociones por Porcentaje
+- [x] Crear tabla de promociones en base de datos
+- [x] Agregar procedimientos tRPC para crear/actualizar/eliminar promociones
+- [x] Mostrar descuentos en galería
+- [x] Aplicar descuentos al precio
+
+### 2. Categorización de Galería
+- [x] Crear tabla de categorías en base de datos
+- [x] Agregar campos de categoría a galleryItems
+- [x] Crear procedimientos tRPC para categorías
+- [x] Página de galería con filtrado por categorías
+
+### 3. Fotos Destacadas
+- [x] Agregar campos isHighlighted y highlightOrder a galleryItems
+- [x] Crear sección de fotos destacadas en galería
+- [x] Mostrar 3-4 fotos destacadas en la parte superior
+
+### 4. Integración de WhatsApp
+- [x] Crear archivo de constantes de WhatsApp
+- [x] Agregar 3 números de contacto (3124915127, 3224589653, 3204884943)
+- [x] Crear funciones para generar links de WhatsApp
+- [x] Mostrar botones de WhatsApp en galería
+
+### 5. Router de Galería Mejorado
+- [x] Agregar procedimientos para categorías
+- [x] Agregar procedimientos para promociones
+- [x] Agregar procedimientos para actualizar items con categoría/destacado
+- [x] Integrar router en appRouter
+
+### 6. Página de Galería Showcase
+- [x] Crear página GalleryShowcase con categorías
+- [x] Mostrar fotos destacadas en sección especial
+- [x] Filtrado por categorías con tabs
+- [x] Mostrar descuentos en tarjetas
+- [x] Botones de WhatsApp en sección de contacto

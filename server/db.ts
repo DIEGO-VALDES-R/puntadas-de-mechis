@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication, galleryItems, InsertGalleryItem, qrCodeTracking, InsertQRCodeTracking, completionNotifications, InsertCompletionNotification, adminCredentials, InsertAdminCredential, referrals, InsertReferral, discounts, InsertDiscount, inventory, InsertInventory, financialTransactions, InsertFinancialTransaction, patterns, InsertPattern, knittingClasses, InsertKnittingClass, challenges, InsertChallenge, customerPurchases, InsertCustomerPurchase, communityPosts, InsertCommunityPost, communityComments, InsertCommunityComment } from "../drizzle/schema";
+import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication, galleryItems, InsertGalleryItem, qrCodeTracking, InsertQRCodeTracking, completionNotifications, InsertCompletionNotification, adminCredentials, InsertAdminCredential, referrals, InsertReferral, discounts, InsertDiscount, inventory, InsertInventory, financialTransactions, InsertFinancialTransaction, patterns, InsertPattern, knittingClasses, InsertKnittingClass, challenges, InsertChallenge, customerPurchases, InsertCustomerPurchase, communityPosts, InsertCommunityPost, communityComments, InsertCommunityComment, galleryCategories, InsertGalleryCategory, promotions, InsertPromotion } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -371,4 +371,79 @@ export async function getFinancialTransactionsByType(type: 'income' | 'expense' 
   if (!db) return [];
   
   return await db.select().from(financialTransactions).where(eq(financialTransactions.type, type));
+}
+
+
+// Gallery category queries
+export async function createGalleryCategory(data: InsertGalleryCategory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(galleryCategories).values(data);
+  return result;
+}
+
+export async function getAllGalleryCategories() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(galleryCategories).where(eq(galleryCategories.isActive, true));
+}
+
+export async function updateGalleryCategory(id: number, data: Partial<InsertGalleryCategory>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(galleryCategories).set(data).where(eq(galleryCategories.id, id));
+}
+
+// Promotion queries
+export async function createPromotion(data: InsertPromotion) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(promotions).values(data);
+  return result;
+}
+
+export async function getAllPromotions() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(promotions);
+}
+
+export async function getActivePromotions() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(promotions).where(eq(promotions.isActive, true));
+}
+
+export async function updatePromotion(id: number, data: Partial<InsertPromotion>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(promotions).set(data).where(eq(promotions.id, id));
+}
+
+export async function deletePromotion(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(promotions).set({ isActive: false }).where(eq(promotions.id, id));
+}
+
+export async function getHighlightedGalleryItems() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(galleryItems).where(eq(galleryItems.isHighlighted, true)).orderBy(galleryItems.highlightOrder);
+}
+
+export async function getGalleryItemsByCategory(category: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(galleryItems).where(eq(galleryItems.category, category));
 }
