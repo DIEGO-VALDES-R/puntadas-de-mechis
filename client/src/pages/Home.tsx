@@ -224,8 +224,10 @@ export default function Home() {
             </div>
             <div>
               <h4 className="font-bold mb-4">Contacto</h4>
-              <p className="text-gray-400 text-sm">Email: diegoferrangel@gmail.com</p>
-              <p className="text-gray-400 text-sm">Teléfono: +57 312 591 2152</p>
+              <p className="text-gray-400 text-sm">Email: puntadasdemechis@gmail.com</p>
+              <p className="text-gray-400 text-sm">Teléfono: +57 3124915127</p>
+              <p className="text-gray-400 text-sm">Teléfono: +57 3224589653</p>
+              <p className="text-gray-400 text-sm">Teléfono: +57 3204884943</p>
             </div>
             <div>
               <h4 className="font-bold mb-4">Síguenos</h4>

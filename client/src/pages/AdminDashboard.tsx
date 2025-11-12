@@ -5,11 +5,19 @@ import { trpc } from "@/lib/trpc";
 import { Loader2, MessageSquare, CheckCircle, Clock, AlertCircle, Search, Filter, Download, Eye, BarChart3, DollarSign, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminRole");
+    toast.success("Sesión cerrada");
+    setLocation("/");
+  };
   const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
   const [adminMessage, setAdminMessage] = useState("");
   const [adminNotes, setAdminNotes] = useState("");
@@ -216,12 +224,23 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
+      {/* Header */}
+      <div className="bg-white shadow-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
+          <div className="flex gap-4">
+            <Link href="/" className="px-4 py-2 text-gray-600 hover:text-gray-900">Volver al Inicio</Link>
+            <Button variant="outline" onClick={handleLogout}>Cerrar Sesión</Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Panel de Administración</h1>
-          <p className="text-gray-600">Gestiona solicitudes, inventario, contabilidad y promociones</p>
+          <p className="text-gray-600 mb-8">Gestiona solicitudes, inventario, contabilidad y promociones</p>
         </div>
 
         {/* Tabs Navigation */}
@@ -700,6 +719,7 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
       </div>
     </div>
   );
