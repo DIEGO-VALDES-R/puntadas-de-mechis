@@ -16,6 +16,8 @@ import GalleryManager from "./pages/GalleryManager";
 import TrackingPage from "./pages/TrackingPage";
 import AdminLogin from "./pages/AdminLogin";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import CommunityHub from "./pages/CommunityHub";
 
 function Router() {
   return (
@@ -31,6 +33,8 @@ function Router() {
       <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin/gallery"} component={GalleryManager} />
+      <Route path={"/admin/analytics"} component={AnalyticsDashboard} />
+      <Route path={"/community"} component={CommunityHub} />
       <Route path={"/:requestId/track"} component={TrackingPage} />
       <Route path={"/track"} component={TrackingPage} />
       <Route path={"/404"} component={NotFound} />
