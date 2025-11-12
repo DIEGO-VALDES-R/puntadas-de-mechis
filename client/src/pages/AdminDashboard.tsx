@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Loader2, MessageSquare, CheckCircle, Clock, AlertCircle, Search, Filter, Download, Eye } from "lucide-react";
+import { Loader2, MessageSquare, CheckCircle, Clock, AlertCircle, Search, Filter, Download, Eye, BarChart3, DollarSign, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -16,9 +17,12 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "deposit">("newest");
+  const [activeTab, setActiveTab] = useState("solicitudes");
 
   // Fetch all requests - moved to top level
   const requestsQuery = trpc.request.getAll.useQuery();
+  const promotionsQuery = trpc.gallery.getPromotions.useQuery();
+  const categoriesQuery = trpc.gallery.getCategories.useQuery();
   
   // Fetch communications - always called, but with enabled condition
   const communicationsQuery = trpc.communication.getByRequestId.useQuery(
@@ -217,8 +221,20 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Panel de Administración</h1>
-          <p className="text-gray-600">Gestiona todas las solicitudes de amigurumis</p>
+          <p className="text-gray-600">Gestiona solicitudes, inventario, contabilidad y promociones</p>
         </div>
+
+        {/* Tabs Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
+            <TabsTrigger value="inventario">Inventario</TabsTrigger>
+            <TabsTrigger value="contabilidad">Contabilidad</TabsTrigger>
+            <TabsTrigger value="promociones">Promociones</TabsTrigger>
+          </TabsList>
+
+          {/* Solicitudes Tab */}
+          <TabsContent value="solicitudes" className="mt-6">
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
@@ -552,6 +568,138 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+          </TabsContent>
+
+          {/* Inventario Tab */}
+          <TabsContent value="inventario" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Gestión de Inventario</CardTitle>
+                <CardDescription>Registra y controla tus compras de materiales</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12">
+                  <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">Sistema de inventario en desarrollo</p>
+                  <p className="text-sm text-gray-500">Podrás registrar compras de materiales, cantidad, costo y número de referencia</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Contabilidad Tab */}
+          <TabsContent value="contabilidad" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Card className="border-0 shadow-md">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <p className="text-green-600 text-sm font-medium mb-2">Ingresos Totales</p>
+                    <p className="text-3xl font-bold text-green-600">$0</p>
+                    <p className="text-xs text-gray-500 mt-2">De todas las solicitudes</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-md">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <p className="text-red-600 text-sm font-medium mb-2">Gastos Totales</p>
+                    <p className="text-3xl font-bold text-red-600">$0</p>
+                    <p className="text-xs text-gray-500 mt-2">Materiales y compras</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-md">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <p className="text-blue-600 text-sm font-medium mb-2">Ganancia Neta</p>
+                    <p className="text-3xl font-bold text-blue-600">$0</p>
+                    <p className="text-xs text-gray-500 mt-2">Ingresos - Gastos</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Resumen Financiero</CardTitle>
+                <CardDescription>Análisis de ingresos vs gastos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12">
+                  <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">Sistema de contabilidad en desarrollo</p>
+                  <p className="text-sm text-gray-500">Verás gráficos de ingresos, gastos y ganancias mensuales</p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Promociones Tab */}
+          <TabsContent value="promociones" className="mt-6">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle>Promociones Activas ({promotionsQuery.data?.length || 0})</CardTitle>
+                <CardDescription>Descuentos por porcentaje en productos</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {promotionsQuery.data && promotionsQuery.data.length > 0 ? (
+                  <div className="space-y-3">
+                    {promotionsQuery.data.map((promo: any) => (
+                      <div key={promo.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div>
+                          <p className="font-semibold text-gray-900">{promo.name}</p>
+                          <p className="text-sm text-gray-600">Descuento: {promo.discountPercentage}%</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline">Editar</Button>
+                          <Button size="sm" variant="outline" className="text-red-600">Eliminar</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-4">No hay promociones activas</p>
+                    <Button>Crear Promoción</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg mt-6">
+              <CardHeader>
+                <CardTitle>Categorías ({categoriesQuery.data?.length || 0})</CardTitle>
+                <CardDescription>Categorías de productos en la galería</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {categoriesQuery.data && categoriesQuery.data.length > 0 ? (
+                  <div className="space-y-3">
+                    {categoriesQuery.data.map((cat: any) => (
+                      <div key={cat.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{cat.icon}</span>
+                          <p className="font-semibold text-gray-900">{cat.name}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline">Editar</Button>
+                          <Button size="sm" variant="outline" className="text-red-600">Eliminar</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-600 mb-4">No hay categorías creadas</p>
+                    <Button>Crear Categoría</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
