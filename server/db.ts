@@ -447,3 +447,25 @@ export async function getGalleryItemsByCategory(category: string) {
   
   return await db.select().from(galleryItems).where(eq(galleryItems.category, category));
 }
+
+
+// Tracking code generation
+export function generateTrackingCode(): string {
+  // Generate a 6-digit random number
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+export async function getRequestByTrackingCode(trackingCode: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(amigurumiRequests).where(eq(amigurumiRequests.trackingCode, trackingCode)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateRequestTrackingCode(requestId: number, trackingCode: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(amigurumiRequests).set({ trackingCode }).where(eq(amigurumiRequests.id, requestId));
+}

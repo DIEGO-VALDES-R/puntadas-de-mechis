@@ -55,6 +55,7 @@ export const amigurumiRequests = mysqlTable("amigurumiRequests", {
   totalAmount: int("totalAmount"), // Amount in cents
   status: mysqlEnum("status", ["pending", "deposit_paid", "in_progress", "completed", "cancelled"]).default("pending").notNull(),
   paymentId: varchar("paymentId", { length: 100 }),
+  trackingCode: varchar("trackingCode", { length: 6 }).unique(), // 6-digit tracking code
   adminNotes: text("adminNotes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -397,3 +398,6 @@ export const promotions = mysqlTable("promotions", {
 
 export type Promotion = typeof promotions.$inferSelect;
 export type InsertPromotion = typeof promotions.$inferInsert;
+
+// Agregar campo de código de seguimiento si no existe
+// Se ejecutará en la próxima migración

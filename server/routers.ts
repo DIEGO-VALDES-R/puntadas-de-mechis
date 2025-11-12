@@ -27,6 +27,9 @@ import {
   updateQRCodeTracking,
   createCompletionNotification,
   getCompletionNotificationsByRequestId,
+  generateTrackingCode,
+  getRequestByTrackingCode,
+  updateRequestTrackingCode,
 } from "./db";
 import { notifyNewRequest, notifyPaymentReceived } from "./notifications";
 import { mapBoldStatusToInternal } from "./bold";
@@ -174,6 +177,23 @@ export const appRouter = router({
           status: input.status as any,
         });
         return { success: true };
+      }),
+
+    getByTrackingCode: publicProcedure
+      .input(z.object({ trackingCode: z.string().length(6) }))
+      .query(async ({ input }) => {
+        return await getRequestByTrackingCode(input.trackingCode);
+      }),
+  }),
+
+  // Tracking
+  tracking: router({
+    generateCode: protectedProcedure
+      .input(z.object({ requestId: z.number() }))
+      .mutation(async ({ input }) => {
+        const trackingCode = generateTrackingCode();
+        await updateRequestTrackingCode(input.requestId, trackingCode);
+        return { trackingCode };
       }),
   }),
 
