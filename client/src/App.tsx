@@ -14,6 +14,8 @@ import MyRequests from "./pages/MyRequests";
 import AdminDashboard from "./pages/AdminDashboard";
 import GalleryManager from "./pages/GalleryManager";
 import TrackingPage from "./pages/TrackingPage";
+import AdminLogin from "./pages/AdminLogin";
+import CustomerDashboard from "./pages/CustomerDashboard";
 
 function Router() {
   return (
@@ -25,6 +27,8 @@ function Router() {
       <Route path={"/payment"} component={Payment} />
       <Route path={"/payment-success"} component={PaymentSuccess} />
       <Route path={"/my-requests"} component={MyRequests} />
+      <Route path={"/customer-panel"} component={CustomerDashboard} />
+      <Route path={"/admin/login"} component={AdminLogin} />
       <Route path={"/admin"} component={AdminDashboard} />
       <Route path={"/admin/gallery"} component={GalleryManager} />
       <Route path={"/:requestId/track"} component={TrackingPage} />

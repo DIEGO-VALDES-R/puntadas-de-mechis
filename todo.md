@@ -132,3 +132,70 @@
 - [x] Agregar procedimiento tRPC para subir imágenes a S3
 - [x] Permitir edición de productos con cambio de foto
 - [x] Validar tipos y tamaños de archivo
+
+
+## Solicitudes Nuevas - Fase 2 de Desarrollo
+
+### 1. Flujo de Registro Integrado
+- [ ] Modificar formulario de solicitud para incluir registro automático
+- [ ] Si cliente no está registrado, mostrar formulario de registro primero
+- [ ] Guardar datos de cliente antes de procesar solicitud
+- [ ] Redirigir a formulario de amigurumi después de registro
+
+### 2. Sistema de Referidos y Descuentos
+- [ ] Crear tabla de referidos en base de datos
+- [ ] Crear tabla de descuentos/cupones
+- [ ] Implementar lógica de descuento para clientes recurrentes
+- [ ] Crear sistema de asignación de descuentos a referidos
+- [ ] Panel admin para gestionar descuentos por referido
+- [ ] Mostrar descuento aplicado en checkout
+
+### 3. Módulo de Inventario
+- [ ] Crear tabla de inventario en base de datos
+- [ ] Crear página de inventario en panel admin
+- [ ] Agregar funcionalidad para registrar compras pendientes
+- [ ] Agregar funcionalidad para registrar compras hechas
+- [ ] Mostrar cantidad, tipo de producto, número de referencia
+- [ ] Mostrar valores de compra
+- [ ] Generar reportes de inventario
+
+### 4. Módulo de Contabilidad
+- [ ] Crear tabla de transacciones financieras
+- [ ] Crear página de contabilidad en panel admin
+- [ ] Mostrar inversión total vs ingresos totales
+- [ ] Calcular ganancias (ingresos - gastos de materiales)
+- [ ] Mostrar gastos fijos (materiales de compra)
+- [ ] Generar reportes de ganancias
+- [ ] Gráficos de ingresos vs gastos
+
+### 5. Exportación a Google Sheets
+- [ ] Configurar credenciales de Google Sheets API
+- [ ] Crear procedimiento tRPC para exportar clientes
+- [ ] Crear procedimiento tRPC para exportar solicitudes
+- [ ] Crear procedimiento tRPC para exportar transacciones
+- [ ] Botones de exportación en panel admin
+
+### 6. Autenticación del Panel Admin
+- [x] Crear tabla de credenciales admin en base de datos
+- [x] Implementar login con contraseña para panel admin
+- [x] Proteger rutas del panel admin
+- [x] Crear página de login para admin
+- [x] Implementar sesión segura
+
+### 7. Panel de Cliente Registrado
+- [x] Crear página de login para clientes
+- [x] Mostrar historial de compras del cliente
+- [x] Mostrar referidos que han comprado
+- [x] Permitir hacer nuevas solicitudes desde panel
+- [x] Mostrar descuentos disponibles
+- [x] Mostrar estado de solicitudes
+
+### 8. Módulo de Comunidad
+- [ ] Crear tabla de patrones en base de datos
+- [ ] Crear tabla de clases de tejido
+- [ ] Crear tabla de retos
+- [ ] Crear página de tienda de patrones
+- [ ] Crear página de clases de tejido
+- [ ] Crear página de retos
+- [ ] Implementar sistema de compra de patrones/clases
+- [ ] Crear comunidad/foro de tejedoras

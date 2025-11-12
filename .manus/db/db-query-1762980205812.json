@@ -1,0 +1,9 @@
+{
+  "query": "\nINSERT INTO adminCredentials (username, passwordHash, email, role, isActive, createdAt, updatedAt) VALUES\n('diego.valdes', '$2a$10$N9qo8uLOickgx2ZMRZoMye4FZH5lai8DxM51Z8D7VaIabkMg.BLzm', 'diego@example.com', 'super_admin', true, NOW(), NOW()),\n('sandra.buitrago', '$2a$10$N9qo8uLOickgx2ZMRZoMye4FZH5lai8DxM51Z8D7VaIabkMg.BLzm', 'sandra@example.com', 'admin', true, NOW(), NOW()),\n('aida.tamayo', '$2a$10$N9qo8uLOickgx2ZMRZoMye4FZH5lai8DxM51Z8D7VaIabkMg.BLzm', 'aida@example.com', 'admin', true, NOW(), NOW())\nON DUPLICATE KEY UPDATE updatedAt = NOW();\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3aiAzWa4iTsmzYd.root --database E7Gri92ygvWuAGU9Kwnsnx --execute \nINSERT INTO adminCredentials (username, passwordHash, email, role, isActive, createdAt, updatedAt) VALUES\n('diego.valdes', '$2a$10$N9qo8uLOickgx2ZMRZoMye4FZH5lai8DxM51Z8D7VaIabkMg.BLzm', 'diego@example.com', 'super_admin', true, NOW(), NOW()),\n('sandra.buitrago', '$2a$10$N9qo8uLOickgx2ZMRZoMye4FZH5lai8DxM51Z8D7VaIabkMg.BLzm', 'sandra@example.com', 'admin', true, NOW(), NOW()),\n('aida.tamayo', '$2a$10$N9qo8uLOickgx2ZMRZoMye4FZH5lai8DxM51Z8D7VaIabkMg.BLzm', 'aida@example.com', 'admin', true, NOW(), NOW())\nON DUPLICATE KEY UPDATE updatedAt = NOW();\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 931
+}

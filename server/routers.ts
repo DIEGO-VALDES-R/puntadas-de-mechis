@@ -30,9 +30,11 @@ import {
 } from "./db";
 import { notifyNewRequest, notifyPaymentReceived } from "./notifications";
 import { mapBoldStatusToInternal } from "./bold";
+import { adminRouter } from "./routers/admin";
 
 export const appRouter = router({
   system: systemRouter,
+  admin: adminRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {

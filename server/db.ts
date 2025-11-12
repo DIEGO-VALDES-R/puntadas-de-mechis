@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication, galleryItems, InsertGalleryItem, qrCodeTracking, InsertQRCodeTracking, completionNotifications, InsertCompletionNotification } from "../drizzle/schema";
+import { InsertUser, users, customers, InsertCustomer, amigurumiRequests, InsertAmigurumiRequest, payments, InsertPayment, communications, InsertCommunication, galleryItems, InsertGalleryItem, qrCodeTracking, InsertQRCodeTracking, completionNotifications, InsertCompletionNotification, adminCredentials, InsertAdminCredential, referrals, InsertReferral, discounts, InsertDiscount, inventory, InsertInventory, financialTransactions, InsertFinancialTransaction, patterns, InsertPattern, knittingClasses, InsertKnittingClass, challenges, InsertChallenge, customerPurchases, InsertCustomerPurchase, communityPosts, InsertCommunityPost, communityComments, InsertCommunityComment } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -260,4 +260,115 @@ export async function getCompletionNotificationsByRequestId(requestId: number) {
   if (!db) return [];
   
   return await db.select().from(completionNotifications).where(eq(completionNotifications.requestId, requestId));
+}
+
+
+// Admin credentials queries
+export async function createAdminCredential(data: InsertAdminCredential) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(adminCredentials).values(data);
+  return result;
+}
+
+export async function getAdminByUsername(username: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(adminCredentials).where(eq(adminCredentials.username, username)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateAdminLastLogin(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(adminCredentials).set({ lastLogin: new Date() }).where(eq(adminCredentials.id, id));
+}
+
+// Referral queries
+export async function createReferral(data: InsertReferral) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(referrals).values(data);
+  return result;
+}
+
+export async function getReferralsByReferrerId(referrerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(referrals).where(eq(referrals.referrerId, referrerId));
+}
+
+// Discount queries
+export async function createDiscount(data: InsertDiscount) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(discounts).values(data);
+  return result;
+}
+
+export async function getDiscountByCode(code: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(discounts).where(eq(discounts.code, code)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAllDiscounts() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(discounts).where(eq(discounts.isActive, true));
+}
+
+// Inventory queries
+export async function createInventoryItem(data: InsertInventory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(inventory).values(data);
+  return result;
+}
+
+export async function getAllInventory() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(inventory);
+}
+
+export async function updateInventoryItem(id: number, data: Partial<InsertInventory>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(inventory).set(data).where(eq(inventory.id, id));
+}
+
+// Financial transaction queries
+export async function createFinancialTransaction(data: InsertFinancialTransaction) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(financialTransactions).values(data);
+  return result;
+}
+
+export async function getAllFinancialTransactions() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(financialTransactions);
+}
+
+export async function getFinancialTransactionsByType(type: 'income' | 'expense' | 'refund') {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(financialTransactions).where(eq(financialTransactions.type, type));
 }
