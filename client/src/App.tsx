@@ -1,12 +1,9 @@
-// client/src/App.tsx
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-
-// Páginas
 import Home from "./pages/Home";
 import Test from "./pages/Test";
 import Register from "./pages/Register";
@@ -23,52 +20,37 @@ import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import CommunityHub from "./pages/CommunityHub";
 import TrackRequest from "./pages/TrackRequest";
 
-// React Query
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { trpc } from "@/lib/trpc"; // Cliente trpc generado con createTRPCReact
+import { trpcClient } from "@/lib/trpcClient";
 
-// TRPC
-import { trpc } from "@/lib/trpc"; // tu cliente generado con createTRPCReact
-import { httpBatchLink } from "@trpc/client";
-
-// Crear QueryClient
 const queryClient = new QueryClient();
 
-// Crear TRPC Client
-const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: "/api/trpc", // URL relativa a tu backend
-    }),
-  ],
-});
-
-// Rutas
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/test" component={Test} />
-      <Route path="/register" component={Register} />
-      <Route path="/request" component={RequestAmigurumi} />
-      <Route path="/payment" component={Payment} />
-      <Route path="/payment-success" component={PaymentSuccess} />
-      <Route path="/my-requests" component={MyRequests} />
-      <Route path="/customer-panel" component={CustomerDashboard} />
-      <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/gallery" component={GalleryManager} />
-      <Route path="/admin/analytics" component={AnalyticsDashboard} />
-      <Route path="/community" component={CommunityHub} />
-      <Route path="/track-request" component={TrackRequest} />
-      <Route path="/:requestId/track" component={TrackingPage} />
-      <Route path="/track" component={TrackingPage} />
-      <Route path="/404" component={NotFound} />
+      <Route path={"/"} component={Home} />
+      <Route path={"/test"} component={Test} />
+      <Route path={"/register"} component={Register} />
+      <Route path={"/request"} component={RequestAmigurumi} />
+      <Route path={"/payment"} component={Payment} />
+      <Route path={"/payment-success"} component={PaymentSuccess} />
+      <Route path={"/my-requests"} component={MyRequests} />
+      <Route path={"/customer-panel"} component={CustomerDashboard} />
+      <Route path={"/admin/login"} component={AdminLogin} />
+      <Route path={"/admin"} component={AdminDashboard} />
+      <Route path={"/admin/gallery"} component={GalleryManager} />
+      <Route path={"/admin/analytics"} component={AnalyticsDashboard} />
+      <Route path={"/community"} component={CommunityHub} />
+      <Route path={"/track-request"} component={TrackRequest} />
+      <Route path={"/:requestId/track"} component={TrackingPage} />
+      <Route path={"/track"} component={TrackingPage} />
+      <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// App principal
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
