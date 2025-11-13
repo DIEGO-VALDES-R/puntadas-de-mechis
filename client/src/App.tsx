@@ -1,3 +1,7 @@
+import { TRPCProvider } from '@trpc/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { trpcClient } from '@/lib/trpcClient';
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -19,6 +23,8 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import CommunityHub from "./pages/CommunityHub";
 import TrackRequest from "./pages/TrackRequest";
+
+const queryClient = new QueryClient();
 
 function Router() {
   return (
@@ -47,16 +53,18 @@ function Router() {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-      >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TRPCProvider client={trpcClient} queryClient={queryClient}>
+        <ErrorBoundary>
+          <ThemeProvider defaultTheme="light">
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
+      </TRPCProvider>
+    </QueryClientProvider>
   );
 }
 
