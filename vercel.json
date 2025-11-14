@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm install --legacy-peer-deps && npm run build",
-  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "pnpm install --frozen-lockfile --include=dev",
+  "installCommand": "pnpm run build",
   "outputDirectory": "dist/public",
   "framework": null,
   "rewrites": [
